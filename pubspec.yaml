@@ -59,7 +59,7 @@ flutter:
   assets:
     - assets/example.png
     - assets/damage.png
-    - assets/finishLine.png
+    - assets/finish.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

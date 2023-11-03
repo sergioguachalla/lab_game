@@ -33,7 +33,6 @@ class _HomeState extends State<Home> {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
 
       setState(() {
-
         player.moveForward(10);
         print(player.y);
       });
@@ -83,7 +82,17 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: Stack(
         children: [
-        CustomPaint(
+          Positioned(
+            top: 0, // puedes ajustar según la posición exacta que desees
+            left: size.width/3, // puedes ajustar según la posición exacta que desees
+            child: Container(
+              width: 300,
+              height: 150,
+              child: Image.asset('assets/finish.jpg'), // ruta de tu imagen
+            ),
+          ),
+
+          CustomPaint(
           painter: GamePainter(player: player,x: x,y: y),
           child: Container(),
         ),
@@ -131,13 +140,17 @@ class _HomeState extends State<Home> {
                 playerLife -= obstacles.last.damage;
               });
             }
+            if(didWon()){
+              _showGameOverDialog(context, 'Has ganado!');
+            }
             setState(() {
               y-=24;
+              print(y);
             });
 
 
           if(playerLife <= 0){
-            _showGameOverDialog(context);
+            _showGameOverDialog(context, 'Has perdido');
           }
         },
           ),
@@ -163,7 +176,7 @@ class _HomeState extends State<Home> {
                   });
                 }
                 if(playerLife <= 0){
-                  _showGameOverDialog(context);
+                  _showGameOverDialog(context,'Has perdido');
                 }
                 setState(() {
                   y+=24;
@@ -190,7 +203,7 @@ class _HomeState extends State<Home> {
                     });
                   }
                   if(playerLife <= 0){
-                    _showGameOverDialog(context);
+                    _showGameOverDialog(context,'Has perdido');
                   }
 
                   x -= 24;
@@ -217,7 +230,7 @@ class _HomeState extends State<Home> {
                     });
                   }
                   if(playerLife <= 0){
-                    _showGameOverDialog(context);
+                    _showGameOverDialog(context,'Has perdido');
                   }
                   x += 24;
                 });
@@ -297,11 +310,11 @@ class _HomeState extends State<Home> {
     List<Widget> stars = [];
     for (int i = 1; i <= 3; i++) {
       if (playerLife >= i) {
-        stars.add(Icon(Icons.star, color: Colors.yellow));
+        stars.add(Icon(Icons.star, color: Colors.yellow, size: 40));
       } else if (playerLife >= i - 0.5 && playerLife < i) {
-        stars.add(Icon(Icons.star_half, color: Colors.yellow));
+        stars.add(Icon(Icons.star_half, color: Colors.yellow, size: 40,));
       } else {
-        stars.add(Icon(Icons.star_border, color: Colors.yellow));
+        stars.add(Icon(Icons.star_border, color: Colors.yellow, size: 40,));
       }
     }
     return stars;
@@ -374,13 +387,13 @@ class _HomeState extends State<Home> {
       },
     );
   }
-  _showGameOverDialog(BuildContext context) async {
+  _showGameOverDialog(BuildContext context, String content) async {
     await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Has perdido'),
+          title: Text(content),
           actions: <Widget>[
             TextButton(
               child: Text('OK'),
@@ -400,4 +413,7 @@ class _HomeState extends State<Home> {
         context, MaterialPageRoute(builder: (BuildContext context) => Home()));
   }
 
+  bool didWon(){
+      return y <= 190 ;
+  }
 }
