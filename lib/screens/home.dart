@@ -25,7 +25,6 @@ class _HomeState extends State<Home> {
   Player player = Player(size: 36, x: 0, y: 0);
   Timer? _timer;
   double playerLife = 3.0;
-  bool tookDamage = false;
 
 
 
@@ -81,9 +80,6 @@ class _HomeState extends State<Home> {
       CircleObstacle(x: size.width * 0.18, y: size.height * 0.45),  // Reducido en 0.02
       CircleObstacle(x: size.width * 0.78, y: size.height * 0.6),   // Reducido en 0.02
     ];
-
-
-
     return Scaffold(
       body: Stack(
         children: [
@@ -117,36 +113,39 @@ class _HomeState extends State<Home> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            IconButton(
-              icon: Icon(Icons.arrow_circle_up),
-              onPressed:
-              (){
-                if(collidingWithCircles(circleObstacles)){
-                  setState(() {
+          IconButton(
+            icon: Icon(Icons.arrow_circle_up),
+            onPressed: (){
+            if(collidingWithCircles(circleObstacles)){
+              setState(() {
+                playerLife -= circleObstacles.last.damage;
+              });
+            }
+            if(collidingWithTriangles(triangleObstacles)){
+              setState(() {
+                playerLife -= triangleObstacles.last.damage;
+              });
+            }
+            if(collidingWithObstacles(obstacles)){
+              setState(() {
+                playerLife -= obstacles.last.damage;
+              });
+            }
+            setState(() {
+              y-=24;
+            });
 
-                    playerLife -= circleObstacles.last.damage;
-                  });
-                }
 
-                if(collidingWithTriangles(triangleObstacles)){
-                  setState(() {
-                    playerLife -= triangleObstacles.last.damage;
-                  });
-                }
-                if(collidingWithObstacles(obstacles)){
-                  setState(() {
-                    playerLife -= obstacles.last.damage;
-                  });
-                }
-                setState(() {
-                    y-=24;
-                });
-              },
-            ),
+          if(playerLife <= 0){
+            _showGameOverDialog(context);
+          }
+        },
+          ),
             IconButton(
               icon: Icon(Icons.arrow_circle_down),
               onPressed:
               (){
+
                 if(collidingWithCircles(circleObstacles)){
                   setState(() {
                     playerLife -= circleObstacles.last.damage;
@@ -162,6 +161,9 @@ class _HomeState extends State<Home> {
                   setState(() {
                     playerLife -= obstacles.last.damage;
                   });
+                }
+                if(playerLife <= 0){
+                  _showGameOverDialog(context);
                 }
                 setState(() {
                   y+=24;
@@ -187,6 +189,9 @@ class _HomeState extends State<Home> {
                       playerLife -= obstacles.last.damage;
                     });
                   }
+                  if(playerLife <= 0){
+                    _showGameOverDialog(context);
+                  }
 
                   x -= 24;
                 });
@@ -210,6 +215,9 @@ class _HomeState extends State<Home> {
                     setState(() {
                       playerLife -= obstacles.last.damage;
                     });
+                  }
+                  if(playerLife <= 0){
+                    _showGameOverDialog(context);
                   }
                   x += 24;
                 });
@@ -365,6 +373,31 @@ class _HomeState extends State<Home> {
         );
       },
     );
+  }
+  _showGameOverDialog(BuildContext context) async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Has perdido'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Cierra el diálogo
+                _reloadApp(context); // Recarga la aplicación
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _reloadApp(BuildContext context) {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (BuildContext context) => Home()));
   }
 
 }
